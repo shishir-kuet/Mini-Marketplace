@@ -1,0 +1,182 @@
+name: CI/CD Pipeline - Mini Marketplace
+
+on:
+  push:
+    branches:
+      - '**'  # Run on push to any branch
+  pull_request:
+    branches:
+      - '**'  # Run on pull request to any branch
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: mini_marketplace_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Create test application.yaml
+        run: |
+          mkdir -p src/test/resources
+          cat > src/test/resources/application.yaml << 'EOF'
+          spring:
+            datasource:
+              url: jdbc:postgresql://localhost:5432/mini_marketplace_test
+              username: postgres
+              password: postgres
+              driver-class-name: org.postgresql.Driver
+            jpa:
+              hibernate:
+                ddl-auto: create-drop
+              show-sql: false
+              properties:
+                hibernate:
+                  dialect: org.hibernate.dialect.PostgreSQLDialect
+                  format_sql: true
+            security:
+              user:
+                name: testuser
+                password: testpassword
+          
+          jwt:
+            secret: testSecretKeyForJWTTokenGenerationInTestEnvironmentMustBeLongEnough
+            expiration: 86400000
+          
+          logging:
+            level:
+              org.springframework.security: DEBUG
+              org.hibernate.SQL: DEBUG
+          EOF
+
+      - name: Run tests with Maven
+        run: ./mvnw clean test --batch-mode --fail-at-end
+        env:
+          SPRING_PROFILES_ACTIVE: test
+
+      - name: Generate test report
+        if: always()
+        run: ./mvnw surefire-report:report --batch-mode
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: target/surefire-reports/
+
+      - name: Upload test coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-coverage
+          path: target/site/
+
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f target/surefire-reports/*.xml ]; then
+            echo "✅ Tests completed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Check the artifacts for detailed test reports." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Tests failed or did not run" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  build:
+    name: Build Application
+    needs: test
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven (skip tests)
+        run: ./mvnw clean package -DskipTests --batch-mode
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mini-marketplace-jar
+          path: target/*.jar
+
+      - name: Build Summary
+        run: |
+          echo "## Build Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Build successful" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Branch: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "Commit: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+
+  status-check:
+    name: CI/CD Status Check
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Check test status
+        if: needs.test.result != 'success'
+        run: |
+          echo "❌ Tests failed"
+          exit 1
+
+      - name: Check build status
+        if: needs.build.result != 'success'
+        run: |
+          echo "❌ Build failed"
+          exit 1
+
+      - name: All checks passed
+        if: needs.test.result == 'success' && needs.build.result == 'success'
+        run: |
+          echo "✅ All CI/CD checks passed successfully!"
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎉 CI/CD Pipeline Completed Successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Tests passed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Build successful" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Ready to merge! 🚀" >> $GITHUB_STEP_SUMMARY
