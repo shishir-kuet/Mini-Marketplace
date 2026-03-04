@@ -1,9 +1,7 @@
 package com.__2107027.mini_marketplace.dto;
 
-import com.__2107027.mini_marketplace.model.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -21,7 +19,4 @@ public class RegistrationRequest {
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
-    
-    @NotNull(message = "Role is required")
-    private Role role;
 }

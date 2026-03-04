@@ -5,6 +5,7 @@ import com.__2107027.mini_marketplace.dto.RegistrationRequest;
 import com.__2107027.mini_marketplace.model.Role;
 import com.__2107027.mini_marketplace.model.User;
 import com.__2107027.mini_marketplace.repository.UserRepository;
+import com.__2107027.mini_marketplace.security.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class AuthController {
 
     @Autowired
@@ -32,9 +35,12 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     /**
      * User Registration Endpoint
-     * Accepts username, email, password, and role
+     * All new users are registered as USER role by default
      * Password is encrypted with BCrypt before saving
      */
     @PostMapping("/register")
@@ -53,12 +59,12 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        // Create new user
+        // Create new user with USER role by default
         User user = new User();
         user.setUsername(registrationRequest.getUsername());
         user.setEmail(registrationRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registrationRequest.getPassword())); // BCrypt encryption
-        user.setRole(registrationRequest.getRole());
+        user.setRole(Role.USER); // Default role for all new users
         user.setEnabled(true);
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);
@@ -74,8 +80,8 @@ public class AuthController {
 
     /**
      * User Login Endpoint
-     * Authenticates user with username and password
-     * Returns success message with user role
+     * Authenticates user and returns JWT token
+     * Token contains username and role information
      */
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -90,16 +96,23 @@ public class AuthController {
                 )
             );
 
-            // Set authentication in security context
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // Get user details from authentication
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            
+            // Generate JWT token
+            String token = jwtUtil.generateToken(userDetails);
 
-            // Get user details
+            // Get user from database
             User user = userRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+            // Return token and user info
             response.put("message", "Login successful");
+            response.put("token", token);
             response.put("username", user.getUsername());
             response.put("role", user.getRole().name());
+            response.put("tokenType", "Bearer");
+            
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
@@ -109,18 +122,8 @@ public class AuthController {
     }
 
     /**
-     * Logout Endpoint
-     */
-    @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser() {
-        SecurityContextHolder.clearContext();
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Logged out successfully");
-        return ResponseEntity.ok(response);
-    }
-
-    /**
      * Get Current User Info
+     * Requires valid JWT token in Authorization header
      */
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser() {
