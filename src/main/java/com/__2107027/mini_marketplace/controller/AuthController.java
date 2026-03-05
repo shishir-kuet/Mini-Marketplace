@@ -2,7 +2,6 @@ package com.__2107027.mini_marketplace.controller;
 
 import com.__2107027.mini_marketplace.dto.LoginRequest;
 import com.__2107027.mini_marketplace.dto.RegistrationRequest;
-import com.__2107027.mini_marketplace.model.Role;
 import com.__2107027.mini_marketplace.model.User;
 import com.__2107027.mini_marketplace.repository.UserRepository;
 import com.__2107027.mini_marketplace.security.JwtUtil;
@@ -64,17 +63,13 @@ public class AuthController {
         user.setUsername(registrationRequest.getUsername());
         user.setEmail(registrationRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registrationRequest.getPassword())); // BCrypt encryption
-        user.setRole(Role.USER); // Default role for all new users
-        user.setEnabled(true);
-        user.setAccountNonExpired(true);
-        user.setAccountNonLocked(true);
-        user.setCredentialsNonExpired(true);
+        user.setRole("user"); // Default role for all new users
 
         userRepository.save(user);
 
         response.put("message", "User registered successfully");
         response.put("username", user.getUsername());
-        response.put("role", user.getRole().name());
+        response.put("role", user.getRole());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -110,7 +105,7 @@ public class AuthController {
             response.put("message", "Login successful");
             response.put("token", token);
             response.put("username", user.getUsername());
-            response.put("role", user.getRole().name());
+            response.put("role", user.getRole());
             response.put("tokenType", "Bearer");
             
             return ResponseEntity.ok(response);
@@ -140,7 +135,7 @@ public class AuthController {
         Map<String, Object> response = new HashMap<>();
         response.put("username", user.getUsername());
         response.put("email", user.getEmail());
-        response.put("role", user.getRole().name());
+        response.put("role", user.getRole());
         return ResponseEntity.ok(response);
     }
 }
