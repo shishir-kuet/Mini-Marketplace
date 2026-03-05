@@ -1,6 +1,7 @@
 package com.__2107027.mini_marketplace.dto;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -21,7 +22,8 @@ public class ProductRequest {
 
     private String imageUrl;
 
-    private Boolean inStock; // null means keep default (true for new products)
+    @Min(value = 0, message = "Stock count cannot be negative")
+    private Integer stockCount; // null = keep existing; 0 = out of stock
 
     // Getters and Setters
     public String getTitle() { return title; }
@@ -36,6 +38,6 @@ public class ProductRequest {
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public Boolean getInStock() { return inStock; }
-    public void setInStock(Boolean inStock) { this.inStock = inStock; }
+    public Integer getStockCount() { return stockCount; }
+    public void setStockCount(Integer stockCount) { this.stockCount = stockCount; }
 }

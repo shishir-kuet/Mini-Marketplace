@@ -68,6 +68,7 @@ class OrderServiceTest {
 
         product = new Product("Gaming Laptop", "RTX 4060", new BigDecimal("75000.00"), 2L);
         product.setId(1L);
+        product.setStockCount(10);
         product.setCreatedAt(LocalDateTime.now());
 
         pendingOrder = new Order(1L, "pending");
@@ -98,6 +99,7 @@ class OrderServiceTest {
         when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(buyer));
         when(orderRepository.save(any(Order.class))).thenReturn(pendingOrder);
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.save(any(Product.class))).thenReturn(product);
         when(orderItemRepository.save(any(OrderItem.class))).thenReturn(orderItem);
         when(orderItemRepository.findByOrderId(1L)).thenReturn(List.of(orderItem));
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
@@ -110,6 +112,30 @@ class OrderServiceTest {
         assertThat(response.getBuyerId()).isEqualTo(1L);
         assertThat(response.getTotalAmount()).isEqualByComparingTo("150000.00"); // 75000 × 2
         verify(orderItemRepository, times(1)).save(any(OrderItem.class));
+        verify(productRepository, atLeastOnce()).save(any(Product.class)); // stock decremented
+    }
+
+    @Test
+    @DisplayName("placeOrder: should throw IllegalArgumentException when not enough stock")
+    void placeOrder_insufficientStock_throwsException() {
+        product.setStockCount(1); // only 1 in stock
+
+        OrderItemRequest itemRequest = new OrderItemRequest();
+        itemRequest.setProductId(1L);
+        itemRequest.setQuantity(5); // requesting 5
+
+        OrderRequest request = new OrderRequest();
+        request.setItems(List.of(itemRequest));
+
+        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(buyer));
+        when(orderRepository.save(any(Order.class))).thenReturn(pendingOrder);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> orderService.placeOrder(request))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("stock");
+
+        verify(orderItemRepository, never()).save(any(OrderItem.class));
     }
 
     @Test

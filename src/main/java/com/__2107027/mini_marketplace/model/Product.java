@@ -2,6 +2,7 @@ package com.__2107027.mini_marketplace.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -41,8 +42,9 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "in_stock", nullable = false, columnDefinition = "boolean not null default true")
-    private boolean inStock = true;
+    @Min(0)
+    @Column(name = "stock_count", nullable = false, columnDefinition = "integer not null default 0")
+    private int stockCount = 0;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -51,8 +53,8 @@ public class Product {
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public boolean isInStock() { return inStock; }
-    public void setInStock(boolean inStock) { this.inStock = inStock; }
+    public int getStockCount() { return stockCount; }
+    public void setStockCount(int stockCount) { this.stockCount = stockCount; }
 
     // Constructors
     public Product() {}

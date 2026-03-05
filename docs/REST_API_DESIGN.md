@@ -94,7 +94,7 @@ Response `204 No Content`
 
 ### GET /api/products — All Products *(Public)*
 ```json
-[{ "id": 1, "title": "Gaming Laptop", "description": "...", "price": 75000.00, "sellerId": 1, "sellerUsername": "ratul", "imageUrl": "https://example.com/laptop.jpg", "inStock": true, "createdAt": "..." }]
+[{ "id": 1, "title": "Gaming Laptop", "description": "...", "price": 75000.00, "sellerId": 1, "sellerUsername": "ratul", "imageUrl": "https://example.com/laptop.jpg", "stockCount": 10, "createdAt": "..." }]
 ```
 
 ### GET /api/products/{id} — By ID *(Public)*
@@ -107,16 +107,18 @@ Response `204 No Content`
 
 ### POST /api/products — Create Product *(Authenticated)*
 ```json
-{ "title": "Gaming Laptop", "description": "RTX 4060, 16GB RAM", "price": 75000.00, "imageUrl": "https://example.com/laptop.jpg", "inStock": true }
+{ "title": "Gaming Laptop", "description": "RTX 4060, 16GB RAM", "price": 75000.00, "imageUrl": "https://example.com/laptop.jpg", "stockCount": 10 }
 ```
-`imageUrl` and `inStock` are optional. Default `inStock` is `true`.
+`imageUrl` and `stockCount` are optional. Default `stockCount` is `0`.
 Response `201 Created` — product object
 
 ### PUT /api/products/{id} — Update Product *(Owner or Admin)*
 ```json
-{ "title": "Gaming Laptop Pro", "description": "Updated", "price": 80000.00, "imageUrl": "https://example.com/new-image.jpg", "inStock": false }
+{ "title": "Gaming Laptop Pro", "description": "Updated", "price": 80000.00, "imageUrl": "https://example.com/new-image.jpg", "stockCount": 5 }
 ```
-`imageUrl` is optional — send `null` to clear it. Set `inStock: false` when product is out of stock.
+`imageUrl` optional — send `null` to clear it. `stockCount: 0` means out of stock.
+
+When an order is placed, `stockCount` is automatically decremented. When an order is cancelled (by buyer, seller, or admin), stock is automatically restored.
 Error `403` — if not owner and not admin
 
 ### DELETE /api/products/{id} — Delete Product *(Owner or Admin)*

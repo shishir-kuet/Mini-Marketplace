@@ -99,9 +99,9 @@ public class OrderService {
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Product not found with id: " + itemRequest.getProductId()));
 
-            if (!product.isInStock()) {
+            if (product.getStockCount() < itemRequest.getQuantity()) {
                 throw new IllegalArgumentException(
-                        "Product '" + product.getTitle() + "' is currently out of stock");
+                        "Not enough stock for '" + product.getTitle() + "'. Available: " + product.getStockCount());
             }
 
             OrderItem orderItem = new OrderItem();
@@ -110,6 +110,10 @@ public class OrderService {
             orderItem.setQuantity(itemRequest.getQuantity());
             orderItem.setPrice(product.getPrice()); // snapshot price at time of purchase
             orderItemRepository.save(orderItem);
+
+            // Decrement stock
+            product.setStockCount(product.getStockCount() - itemRequest.getQuantity());
+            productRepository.save(product);
         }
 
         return toResponse(order);
@@ -152,6 +156,14 @@ public class OrderService {
         if (!"pending".equals(order.getStatus())) {
             throw new IllegalArgumentException("Only pending orders can be cancelled");
         }
+
+        // Restore stock for each item
+        orderItemRepository.findByOrderId(order.getId()).forEach(item ->
+            productRepository.findById(item.getProductId()).ifPresent(product -> {
+                product.setStockCount(product.getStockCount() + item.getQuantity());
+                productRepository.save(product);
+            })
+        );
 
         order.setStatus("cancelled");
         return toResponse(orderRepository.save(order));
@@ -228,6 +240,16 @@ public class OrderService {
 
         if ("cancelled".equals(order.getStatus()) || "completed".equals(order.getStatus())) {
             throw new IllegalArgumentException("Cannot update a " + order.getStatus() + " order");
+        }
+
+        // Restore stock when cancelling
+        if ("cancelled".equals(newStatus)) {
+            orderItemRepository.findByOrderId(order.getId()).forEach(item ->
+                productRepository.findById(item.getProductId()).ifPresent(product -> {
+                    product.setStockCount(product.getStockCount() + item.getQuantity());
+                    productRepository.save(product);
+                })
+            );
         }
 
         order.setStatus(newStatus);
