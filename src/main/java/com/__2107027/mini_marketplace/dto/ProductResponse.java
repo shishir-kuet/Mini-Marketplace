@@ -10,18 +10,20 @@ public class ProductResponse {
     private BigDecimal price;
     private Long sellerId;
     private String sellerUsername;
+    private String imageUrl;
     private LocalDateTime createdAt;
 
     public ProductResponse() {}
 
     public ProductResponse(Long id, String title, String description, BigDecimal price,
-                           Long sellerId, String sellerUsername, LocalDateTime createdAt) {
+                           Long sellerId, String sellerUsername, String imageUrl, LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.price = price;
         this.sellerId = sellerId;
         this.sellerUsername = sellerUsername;
+        this.imageUrl = imageUrl;
         this.createdAt = createdAt;
     }
 
@@ -43,6 +45,9 @@ public class ProductResponse {
 
     public String getSellerUsername() { return sellerUsername; }
     public void setSellerUsername(String sellerUsername) { this.sellerUsername = sellerUsername; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

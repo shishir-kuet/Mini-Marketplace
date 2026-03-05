@@ -37,10 +37,16 @@ public class Product {
     @NotNull
     @Column(name = "seller_id", nullable = false)
     private Long sellerId;
-    
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     
     // Constructors
     public Product() {}
@@ -50,6 +56,14 @@ public class Product {
         this.description = description;
         this.price = price;
         this.sellerId = sellerId;
+    }
+
+    public Product(String title, String description, BigDecimal price, Long sellerId, String imageUrl) {
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.sellerId = sellerId;
+        this.imageUrl = imageUrl;
     }
     
     // Getters and Setters

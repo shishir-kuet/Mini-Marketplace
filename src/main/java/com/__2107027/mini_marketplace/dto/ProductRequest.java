@@ -19,6 +19,8 @@ public class ProductRequest {
     @DecimalMin(value = "0.01", message = "Price must be at least 0.01")
     private BigDecimal price;
 
+    private String imageUrl;
+
     // Getters and Setters
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -28,4 +30,7 @@ public class ProductRequest {
 
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

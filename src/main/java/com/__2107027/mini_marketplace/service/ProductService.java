@@ -43,6 +43,7 @@ public class ProductService {
                 product.getPrice(),
                 product.getSellerId(),
                 sellerUsername,
+                product.getImageUrl(),
                 product.getCreatedAt()
         );
     }
@@ -91,6 +92,7 @@ public class ProductService {
                 request.getPrice(),
                 currentUser.getId()
         );
+        product.setImageUrl(request.getImageUrl());
         return toResponse(productRepository.save(product));
     }
 
@@ -109,6 +111,7 @@ public class ProductService {
         product.setTitle(request.getTitle());
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
+        product.setImageUrl(request.getImageUrl());
         return toResponse(productRepository.save(product));
     }
 
