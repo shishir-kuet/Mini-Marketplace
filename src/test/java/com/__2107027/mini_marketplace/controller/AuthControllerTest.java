@@ -99,7 +99,7 @@ class AuthControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("User registered successfully"))
                 .andExpect(jsonPath("$.username").value("testuser"))
-                .andExpect(jsonPath("$.role").value("USER"));
+                .andExpect(jsonPath("$.role").value("user"));
 
         // Verify
         verify(userRepository, times(1)).save(any(User.class));
@@ -277,7 +277,7 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.message").value("Login successful"))
                 .andExpect(jsonPath("$.token").value("test-jwt-token"))
                 .andExpect(jsonPath("$.username").value("testuser"))
-                .andExpect(jsonPath("$.role").value("USER"))
+                .andExpect(jsonPath("$.role").value("user"))
                 .andExpect(jsonPath("$.tokenType").value("Bearer"));
 
         // Verify
