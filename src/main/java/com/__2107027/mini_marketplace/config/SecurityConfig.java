@@ -87,6 +87,9 @@ public class SecurityConfig {
                 // Public endpoints - accessible without authentication
                 .requestMatchers("/api/auth/**", "/api/public/**").permitAll()
                 
+                // Health check endpoints - no authentication required for monitoring
+                .requestMatchers("/api/health/**").permitAll()
+                
                 // Admin-only endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 
