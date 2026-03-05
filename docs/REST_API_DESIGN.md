@@ -152,6 +152,38 @@ Error `403` — viewing another user's order without admin role
 ### PUT /api/orders/{id}/cancel — Cancel Order *(Own pending orders only)*
 Error `400` — if order is not `pending`
 
+### GET /api/orders/seller-orders — Orders Containing My Products *(Authenticated seller)*
+Returns all orders that include at least one product owned by the current user.
+```json
+[{
+  "id": 1, "buyerId": 6, "buyerUsername": "testuser", "status": "pending",
+  "items": [{"productId": 1, "productTitle": "Gaming Laptop", "quantity": 2, "price": 75000.00, "totalPrice": 150000.00}],
+  "totalAmount": 150000.00, "createdAt": "..."
+}]
+```
+
+### PUT /api/orders/{id}/status — Update Order Status *(Seller or Admin)*
+```json
+{ "status": "processing" }
+```
+Allowed status values:
+
+| Role | Allowed values |
+|---|---|
+| **Seller** (owns a product in the order) | `processing`, `shipped`, `delivered` |
+| **Admin** | `processing`, `shipped`, `delivered`, `cancelled`, `completed` |
+
+Status flow for Cash on Delivery:
+```
+pending → processing (seller confirms)
+        → shipped    (seller ships)
+        → delivered  (seller marks as delivered)
+        → cancelled  (buyer/admin)
+        → completed  (admin)
+```
+Error `400` — if order is already `cancelled` or `completed`
+Error `403` — seller trying to set `cancelled` or `completed`
+
 ### GET /api/orders — All Orders *(Admin only)*
 
 ### PUT /api/orders/{id}/complete — Complete Order *(Admin only)*
@@ -189,9 +221,12 @@ Response `204 No Content`
 | POST /auth/register, /auth/login | ✅ | | | |
 | POST /products | | ✅ | | |
 | GET /products/my, /orders/my, /users/me | | ✅ | | |
+| GET /orders/seller-orders | | ✅ | | |
 | POST /orders, PUT /users/me | | ✅ | | |
+| PUT /orders/{id}/status (seller-valid statuses) | | ✅ | | |
 | PUT /products/{id}, DELETE /products/{id} | | | ✅ | |
 | GET /orders/{id}, PUT /orders/{id}/cancel | | | ✅ | |
+| PUT /orders/{id}/status (any status) | | | | ✅ |
 | GET /orders, PUT /orders/{id}/complete | | | | ✅ |
 | POST/PUT/DELETE /categories | | | | ✅ |
 | GET /users, PUT /users/{id}/role, DELETE /users/{id} | | | | ✅ |

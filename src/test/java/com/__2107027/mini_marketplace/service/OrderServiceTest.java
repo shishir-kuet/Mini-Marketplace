@@ -3,6 +3,7 @@ package com.__2107027.mini_marketplace.service;
 import com.__2107027.mini_marketplace.dto.OrderItemRequest;
 import com.__2107027.mini_marketplace.dto.OrderRequest;
 import com.__2107027.mini_marketplace.dto.OrderResponse;
+import com.__2107027.mini_marketplace.dto.OrderStatusRequest;
 import com.__2107027.mini_marketplace.exception.ResourceNotFoundException;
 import com.__2107027.mini_marketplace.model.Order;
 import com.__2107027.mini_marketplace.model.OrderItem;
@@ -29,11 +30,13 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyCollection;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("OrderService Unit Tests")
@@ -228,5 +231,99 @@ class OrderServiceTest {
 
         assertThatThrownBy(() -> orderService.getOrderById(1L))
             .isInstanceOf(AccessDeniedException.class);
+    }
+
+    // ── getSellerOrders ───────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("getSellerOrders: should return orders containing seller's products")
+    void getSellerOrders_returnsOrdersWithSellerProducts() {
+        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(buyer));
+        when(productRepository.findBySellerId(1L)).thenReturn(List.of(product));
+        when(orderItemRepository.findByProductId(1L)).thenReturn(List.of(orderItem));
+        when(orderRepository.findByIdIn(anyCollection())).thenReturn(List.of(pendingOrder));
+        when(orderItemRepository.findByOrderId(1L)).thenReturn(List.of(orderItem));
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(buyer));
+
+        List<OrderResponse> result = orderService.getSellerOrders();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getId()).isEqualTo(1L);
+        verify(productRepository).findBySellerId(1L);
+    }
+
+    @Test
+    @DisplayName("getSellerOrders: should return empty list when seller has no products")
+    void getSellerOrders_noProducts_returnsEmpty() {
+        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(buyer));
+        when(productRepository.findBySellerId(1L)).thenReturn(List.of());
+
+        List<OrderResponse> result = orderService.getSellerOrders();
+
+        assertThat(result).isEmpty();
+        verifyNoInteractions(orderRepository);
+    }
+
+    // ── updateOrderStatus ─────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("updateOrderStatus: seller can set status to processing")
+    void updateOrderStatus_seller_toProcessing_success() {
+        Order processingOrder = new Order(1L, "processing");
+        processingOrder.setId(1L);
+        processingOrder.setCreatedAt(LocalDateTime.now());
+
+        OrderStatusRequest request = new OrderStatusRequest();
+        request.setStatus("processing");
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(pendingOrder));
+        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(buyer));
+        when(productRepository.findBySellerId(1L)).thenReturn(List.of(product)); // product.id=1
+        when(orderItemRepository.findByOrderId(1L)).thenReturn(List.of(orderItem)); // orderItem.productId=1
+        when(orderRepository.save(any(Order.class))).thenReturn(processingOrder);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(buyer));
+
+        OrderResponse result = orderService.updateOrderStatus(1L, request);
+
+        assertThat(result.getStatus()).isEqualTo("processing");
+    }
+
+    @Test
+    @DisplayName("updateOrderStatus: seller cannot set status to completed")
+    void updateOrderStatus_seller_toCompleted_throwsAccessDenied() {
+        OrderStatusRequest request = new OrderStatusRequest();
+        request.setStatus("completed");
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(pendingOrder));
+        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(buyer));
+        when(productRepository.findBySellerId(1L)).thenReturn(List.of(product));
+        when(orderItemRepository.findByOrderId(1L)).thenReturn(List.of(orderItem));
+
+        assertThatThrownBy(() -> orderService.updateOrderStatus(1L, request))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    @DisplayName("updateOrderStatus: cannot update a cancelled order")
+    void updateOrderStatus_cancelledOrder_throwsIllegalArgument() {
+        Order cancelledOrder = new Order(1L, "cancelled");
+        cancelledOrder.setId(1L);
+
+        OrderStatusRequest request = new OrderStatusRequest();
+        request.setStatus("processing");
+
+        User adminUser = new User();
+        adminUser.setId(1L);
+        adminUser.setUsername("buyer");
+        adminUser.setRole("admin");
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(cancelledOrder));
+        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(adminUser));
+
+        assertThatThrownBy(() -> orderService.updateOrderStatus(1L, request))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("cancelled");
     }
 }

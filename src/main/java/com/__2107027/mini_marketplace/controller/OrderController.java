@@ -2,6 +2,7 @@ package com.__2107027.mini_marketplace.controller;
 
 import com.__2107027.mini_marketplace.dto.OrderRequest;
 import com.__2107027.mini_marketplace.dto.OrderResponse;
+import com.__2107027.mini_marketplace.dto.OrderStatusRequest;
 import com.__2107027.mini_marketplace.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +17,18 @@ import java.util.List;
  * Order REST API
  *
  * Authenticated (any logged-in user):
- *   POST /api/orders               - place a new order
- *   GET  /api/orders/my            - my orders
- *   GET  /api/orders/{id}          - get order by id (own orders only; admin sees all)
- *   PUT  /api/orders/{id}/cancel   - cancel order (must be pending & owned by caller)
+ *   POST /api/orders                  - place a new order
+ *   GET  /api/orders/my               - my orders (buyer)
+ *   GET  /api/orders/{id}             - get order by id (own orders only; admin sees all)
+ *   PUT  /api/orders/{id}/cancel      - cancel order (must be pending & owned by caller)
+ *
+ * Seller (authenticated, owns a product in the order):
+ *   GET  /api/orders/seller-orders    - orders containing my products
+ *   PUT  /api/orders/{id}/status      - update status to processing/shipped/delivered
  *
  * Admin only:
- *   GET  /api/orders               - all orders
- *   PUT  /api/orders/{id}/complete - mark order as completed
+ *   GET  /api/orders                  - all orders
+ *   PUT  /api/orders/{id}/complete    - mark order as completed
  */
 @RestController
 @RequestMapping("/api/orders")
@@ -57,6 +62,22 @@ public class OrderController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.cancelOrder(id));
+    }
+
+    // ── Seller endpoints ──────────────────────────────────────────────────────
+
+    @GetMapping("/seller-orders")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<OrderResponse>> getSellerOrders() {
+        return ResponseEntity.ok(orderService.getSellerOrders());
+    }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<OrderResponse> updateOrderStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody OrderStatusRequest request) {
+        return ResponseEntity.ok(orderService.updateOrderStatus(id, request));
     }
 
     // ── Admin endpoints ───────────────────────────────────────────────────────
