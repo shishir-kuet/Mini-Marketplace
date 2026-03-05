@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Ping health endpoint
         run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.RENDER_URL }}/api/health")
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://mini-marketplace-z2vn.onrender.com/api/health")
           echo "Health check status: $STATUS"
           if [ "$STATUS" != "200" ]; then
             echo "Warning: Health check returned $STATUS"
