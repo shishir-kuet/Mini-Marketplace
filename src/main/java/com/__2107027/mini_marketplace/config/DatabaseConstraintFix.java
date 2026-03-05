@@ -14,17 +14,15 @@ public class DatabaseConstraintFix {
     @PostConstruct
     public void fixDatabaseConstraints() {
         try {
-            // Drop the old constraint if it exists
+            // Drop any old constraint
             jdbcTemplate.execute("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check");
-            System.out.println("✓ Dropped old users_role_check constraint");
-            
-            // Add the new constraint with correct values
-            jdbcTemplate.execute("ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('USER', 'ADMIN'))");
-            System.out.println("✓ Added new users_role_check constraint with correct values");
-            
+
+            // Add constraint matching our simplified schema: role is "user" or "admin"
+            jdbcTemplate.execute("ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('user', 'admin'))");
+            System.out.println("✓ users_role_check constraint applied");
+
         } catch (Exception e) {
             System.err.println("Error fixing database constraints: " + e.getMessage());
-            // Don't throw exception to allow application to start
         }
     }
 }

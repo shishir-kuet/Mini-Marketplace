@@ -2,7 +2,6 @@ package com.__2107027.mini_marketplace.controller;
 
 import com.__2107027.mini_marketplace.dto.LoginRequest;
 import com.__2107027.mini_marketplace.dto.RegistrationRequest;
-import com.__2107027.mini_marketplace.model.Role;
 import com.__2107027.mini_marketplace.model.User;
 import com.__2107027.mini_marketplace.repository.UserRepository;
 import com.__2107027.mini_marketplace.security.JwtUtil;
@@ -77,11 +76,7 @@ class AuthControllerTest {
         testUser.setUsername("testuser");
         testUser.setEmail("test@example.com");
         testUser.setPassword("encodedPassword");
-        testUser.setRole(Role.USER);
-        testUser.setEnabled(true);
-        testUser.setAccountNonExpired(true);
-        testUser.setAccountNonLocked(true);
-        testUser.setCredentialsNonExpired(true);
+        testUser.setRole("user");
     }
 
     // ===========================
@@ -104,7 +99,7 @@ class AuthControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("User registered successfully"))
                 .andExpect(jsonPath("$.username").value("testuser"))
-                .andExpect(jsonPath("$.role").value("USER"));
+                .andExpect(jsonPath("$.role").value("user"));
 
         // Verify
         verify(userRepository, times(1)).save(any(User.class));
@@ -282,7 +277,7 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.message").value("Login successful"))
                 .andExpect(jsonPath("$.token").value("test-jwt-token"))
                 .andExpect(jsonPath("$.username").value("testuser"))
-                .andExpect(jsonPath("$.role").value("USER"))
+                .andExpect(jsonPath("$.role").value("user"))
                 .andExpect(jsonPath("$.tokenType").value("Bearer"));
 
         // Verify

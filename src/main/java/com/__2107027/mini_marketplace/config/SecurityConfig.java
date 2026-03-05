@@ -19,6 +19,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import org.springframework.http.HttpMethod;
+
 import java.util.Arrays;
 
 @Configuration
@@ -84,13 +86,18 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
             .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless REST API  
             .authorizeHttpRequests(authz -> authz
-                // Public endpoints - accessible without authentication
+                // Auth and health endpoints - no authentication required
                 .requestMatchers("/api/auth/**", "/api/public/**").permitAll()
-                
+                .requestMatchers("/api/health/**").permitAll()
+
+                // Public read-only access to products and categories
+                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+
                 // Admin-only endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                
-                // All authenticated users can access their own resources
+
+                // All other requests require authentication
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

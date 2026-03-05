@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+README.md
+DOCKER_SETUP.md
+
+# Maven
+target/
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Scripts and docs
+*.ps1
+*.sh
+*.md
+*.pdf
+*.txt
+
+# Test files
+test-*.ps1

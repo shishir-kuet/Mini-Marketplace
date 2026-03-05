@@ -2,13 +2,9 @@ spring:
   application:
     name: mini-marketplace
   
-  # Default profile for local development with Docker
-  profiles:
-    active: local
-  
-  # PostgreSQL Database Configuration (Docker default)
+  # Default configuration (Docker environment)
   datasource:
-    url: jdbc:postgresql://localhost:5433/mini_marketplace
+    url: jdbc:postgresql://postgres:5432/mini_marketplace
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -16,27 +12,38 @@ spring:
   # JPA/Hibernate Configuration
   jpa:
     hibernate:
-      ddl-auto: update  # Options: create, create-drop, update, validate, none
-    show-sql: true  # Show SQL queries in console
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true  # Format SQL for readability
+        format_sql: true
 
 # JWT Configuration
 jwt:
   secret: mySecretKeyForJWTTokenGenerationMustBeLongEnoughForHS256AlgorithmMinimum256Bits
-  expiration: 86400000  # 24 hours in milliseconds (1000 * 60 * 60 * 24)
-  
+  expiration: 86400000  # 24 hours in milliseconds
+
 # Server Configuration
 server:
-  port: 8083
+  port: 8082
   error:
     include-message: always
     include-binding-errors: always
 
 ---
-# Legacy profile for original teammate setup
+# Local development profile
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mini_marketplace
+    username: postgres
+    password: postgres
+
+---
+# Original teammate configuration
 spring:
   config:
     activate:
