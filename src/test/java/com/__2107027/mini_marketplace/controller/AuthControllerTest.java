@@ -2,7 +2,6 @@ package com.__2107027.mini_marketplace.controller;
 
 import com.__2107027.mini_marketplace.dto.LoginRequest;
 import com.__2107027.mini_marketplace.dto.RegistrationRequest;
-import com.__2107027.mini_marketplace.model.Role;
 import com.__2107027.mini_marketplace.model.User;
 import com.__2107027.mini_marketplace.repository.UserRepository;
 import com.__2107027.mini_marketplace.security.JwtUtil;
@@ -77,11 +76,7 @@ class AuthControllerTest {
         testUser.setUsername("testuser");
         testUser.setEmail("test@example.com");
         testUser.setPassword("encodedPassword");
-        testUser.setRole(Role.USER);
-        testUser.setEnabled(true);
-        testUser.setAccountNonExpired(true);
-        testUser.setAccountNonLocked(true);
-        testUser.setCredentialsNonExpired(true);
+        testUser.setRole("user");
     }
 
     // ===========================

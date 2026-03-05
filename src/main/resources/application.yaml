@@ -8,7 +8,7 @@ spring:
   
   # PostgreSQL Database Configuration (Docker default)
   datasource:
-    url: jdbc:postgresql://localhost:5432/mini_marketplace
+    url: jdbc:postgresql://localhost:5433/mini_marketplace
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -30,7 +30,7 @@ jwt:
   
 # Server Configuration
 server:
-  port: 8082
+  port: 8083
   error:
     include-message: always
     include-binding-errors: always
