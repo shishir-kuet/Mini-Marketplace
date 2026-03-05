@@ -44,6 +44,7 @@ public class ProductService {
                 product.getSellerId(),
                 sellerUsername,
                 product.getImageUrl(),
+                product.isInStock(),
                 product.getCreatedAt()
         );
     }
@@ -93,6 +94,9 @@ public class ProductService {
                 currentUser.getId()
         );
         product.setImageUrl(request.getImageUrl());
+        if (request.getInStock() != null) {
+            product.setInStock(request.getInStock());
+        }
         return toResponse(productRepository.save(product));
     }
 
@@ -112,6 +116,9 @@ public class ProductService {
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setImageUrl(request.getImageUrl());
+        if (request.getInStock() != null) {
+            product.setInStock(request.getInStock());
+        }
         return toResponse(productRepository.save(product));
     }
 

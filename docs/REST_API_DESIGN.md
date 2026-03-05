@@ -94,7 +94,7 @@ Response `204 No Content`
 
 ### GET /api/products — All Products *(Public)*
 ```json
-[{ "id": 1, "title": "Gaming Laptop", "description": "...", "price": 75000.00, "sellerId": 1, "sellerUsername": "ratul", "imageUrl": "https://example.com/laptop.jpg", "createdAt": "..." }]
+[{ "id": 1, "title": "Gaming Laptop", "description": "...", "price": 75000.00, "sellerId": 1, "sellerUsername": "ratul", "imageUrl": "https://example.com/laptop.jpg", "inStock": true, "createdAt": "..." }]
 ```
 
 ### GET /api/products/{id} — By ID *(Public)*
@@ -107,16 +107,16 @@ Response `204 No Content`
 
 ### POST /api/products — Create Product *(Authenticated)*
 ```json
-{ "title": "Gaming Laptop", "description": "RTX 4060, 16GB RAM", "price": 75000.00, "imageUrl": "https://example.com/laptop.jpg" }
+{ "title": "Gaming Laptop", "description": "RTX 4060, 16GB RAM", "price": 75000.00, "imageUrl": "https://example.com/laptop.jpg", "inStock": true }
 ```
-`imageUrl` is optional.
+`imageUrl` and `inStock` are optional. Default `inStock` is `true`.
 Response `201 Created` — product object
 
 ### PUT /api/products/{id} — Update Product *(Owner or Admin)*
 ```json
-{ "title": "Gaming Laptop Pro", "description": "Updated", "price": 80000.00, "imageUrl": "https://example.com/new-image.jpg" }
+{ "title": "Gaming Laptop Pro", "description": "Updated", "price": 80000.00, "imageUrl": "https://example.com/new-image.jpg", "inStock": false }
 ```
-`imageUrl` is optional — send `null` to clear it.
+`imageUrl` is optional — send `null` to clear it. Set `inStock: false` when product is out of stock.
 Error `403` — if not owner and not admin
 
 ### DELETE /api/products/{id} — Delete Product *(Owner or Admin)*
@@ -170,7 +170,7 @@ Allowed status values:
 
 | Role | Allowed values |
 |---|---|
-| **Seller** (owns a product in the order) | `processing`, `shipped`, `delivered` |
+| **Seller** (owns a product in the order) | `processing`, `shipped`, `delivered`, `cancelled` |
 | **Admin** | `processing`, `shipped`, `delivered`, `cancelled`, `completed` |
 
 Status flow for Cash on Delivery:

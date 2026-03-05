@@ -41,13 +41,19 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @Column(name = "in_stock", nullable = false, columnDefinition = "boolean not null default true")
+    private boolean inStock = true;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
-    
+
+    public boolean isInStock() { return inStock; }
+    public void setInStock(boolean inStock) { this.inStock = inStock; }
+
     // Constructors
     public Product() {}
     

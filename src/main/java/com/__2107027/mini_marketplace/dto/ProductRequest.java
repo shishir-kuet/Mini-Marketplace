@@ -21,6 +21,8 @@ public class ProductRequest {
 
     private String imageUrl;
 
+    private Boolean inStock; // null means keep default (true for new products)
+
     // Getters and Setters
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -33,4 +35,7 @@ public class ProductRequest {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public Boolean getInStock() { return inStock; }
+    public void setInStock(Boolean inStock) { this.inStock = inStock; }
 }

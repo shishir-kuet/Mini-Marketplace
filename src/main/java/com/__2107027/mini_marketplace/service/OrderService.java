@@ -99,6 +99,11 @@ public class OrderService {
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Product not found with id: " + itemRequest.getProductId()));
 
+            if (!product.isInStock()) {
+                throw new IllegalArgumentException(
+                        "Product '" + product.getTitle() + "' is currently out of stock");
+            }
+
             OrderItem orderItem = new OrderItem();
             orderItem.setOrderId(order.getId());
             orderItem.setProductId(product.getId());
@@ -216,8 +221,8 @@ public class OrderService {
             }
 
             // Seller can only move to these statuses
-            if (!List.of("processing", "shipped", "delivered").contains(newStatus)) {
-                throw new AccessDeniedException("Sellers can only set status to: processing, shipped, delivered");
+            if (!List.of("processing", "shipped", "delivered", "cancelled").contains(newStatus)) {
+                throw new AccessDeniedException("Sellers can only set status to: processing, shipped, delivered, cancelled");
             }
         }
 

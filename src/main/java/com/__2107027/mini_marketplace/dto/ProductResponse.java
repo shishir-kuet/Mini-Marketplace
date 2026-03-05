@@ -11,12 +11,13 @@ public class ProductResponse {
     private Long sellerId;
     private String sellerUsername;
     private String imageUrl;
+    private boolean inStock;
     private LocalDateTime createdAt;
 
     public ProductResponse() {}
 
     public ProductResponse(Long id, String title, String description, BigDecimal price,
-                           Long sellerId, String sellerUsername, String imageUrl, LocalDateTime createdAt) {
+                           Long sellerId, String sellerUsername, String imageUrl, boolean inStock, LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -24,6 +25,7 @@ public class ProductResponse {
         this.sellerId = sellerId;
         this.sellerUsername = sellerUsername;
         this.imageUrl = imageUrl;
+        this.inStock = inStock;
         this.createdAt = createdAt;
     }
 
@@ -48,6 +50,9 @@ public class ProductResponse {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public boolean isInStock() { return inStock; }
+    public void setInStock(boolean inStock) { this.inStock = inStock; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
