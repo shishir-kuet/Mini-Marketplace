@@ -340,16 +340,33 @@ class OrderServiceTest {
         OrderStatusRequest request = new OrderStatusRequest();
         request.setStatus("processing");
 
-        User adminUser = new User();
-        adminUser.setId(1L);
-        adminUser.setUsername("buyer");
-        adminUser.setRole("admin");
-
+        // Use seller (role=user) so it passes the admin check
         when(orderRepository.findById(1L)).thenReturn(Optional.of(cancelledOrder));
-        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(adminUser));
+        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(buyer));
+        when(productRepository.findBySellerId(1L)).thenReturn(List.of(product));
+        when(orderItemRepository.findByOrderId(1L)).thenReturn(List.of(orderItem));
 
         assertThatThrownBy(() -> orderService.updateOrderStatus(1L, request))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("cancelled");
+    }
+
+    @Test
+    @DisplayName("updateOrderStatus: admin cannot update order status")
+    void updateOrderStatus_admin_throwsAccessDenied() {
+        OrderStatusRequest request = new OrderStatusRequest();
+        request.setStatus("processing");
+
+        User adminUser = new User();
+        adminUser.setId(99L);
+        adminUser.setUsername("buyer");
+        adminUser.setRole("admin");
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(pendingOrder));
+        when(userRepository.findByUsername("buyer")).thenReturn(Optional.of(adminUser));
+
+        assertThatThrownBy(() -> orderService.updateOrderStatus(1L, request))
+            .isInstanceOf(AccessDeniedException.class)
+            .hasMessageContaining("Admins cannot update order status");
     }
 }

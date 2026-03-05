@@ -216,26 +216,26 @@ public class OrderService {
         String newStatus = request.getStatus();
 
         if (currentUser.isAdmin()) {
-            // Admin can set any status
-        } else {
-            // Must be seller of at least one product in this order
-            Set<Long> sellerProductIds = productRepository.findBySellerId(currentUser.getId())
-                    .stream()
-                    .map(Product::getId)
-                    .collect(Collectors.toSet());
+            throw new AccessDeniedException("Admins cannot update order status. Only the seller can.");
+        }
 
-            boolean isSellerOfOrder = orderItemRepository.findByOrderId(order.getId())
-                    .stream()
-                    .anyMatch(item -> sellerProductIds.contains(item.getProductId()));
+        // Must be seller of at least one product in this order
+        Set<Long> sellerProductIds = productRepository.findBySellerId(currentUser.getId())
+                .stream()
+                .map(Product::getId)
+                .collect(Collectors.toSet());
 
-            if (!isSellerOfOrder) {
-                throw new AccessDeniedException("You can only update status of orders containing your products");
-            }
+        boolean isSellerOfOrder = orderItemRepository.findByOrderId(order.getId())
+                .stream()
+                .anyMatch(item -> sellerProductIds.contains(item.getProductId()));
 
-            // Seller can only move to these statuses
-            if (!List.of("processing", "shipped", "delivered", "cancelled").contains(newStatus)) {
-                throw new AccessDeniedException("Sellers can only set status to: processing, shipped, delivered, cancelled");
-            }
+        if (!isSellerOfOrder) {
+            throw new AccessDeniedException("You can only update status of orders containing your products");
+        }
+
+        // Seller can only move to these statuses
+        if (!List.of("processing", "shipped", "delivered", "cancelled").contains(newStatus)) {
+            throw new AccessDeniedException("Sellers can only set status to: processing, shipped, delivered, cancelled");
         }
 
         if ("cancelled".equals(order.getStatus()) || "completed".equals(order.getStatus())) {
