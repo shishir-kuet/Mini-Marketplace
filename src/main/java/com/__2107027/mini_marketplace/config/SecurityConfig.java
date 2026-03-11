@@ -92,7 +92,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless REST API  
             .authorizeHttpRequests(authz -> authz
                 // Serve React app — index.html and all static assets are public
-                .requestMatchers("/", "/index.html", "/favicon.ico").permitAll()
+                .requestMatchers("/", "/index.html", "/favicon.ico", "/error").permitAll()
                 .requestMatchers("/assets/**", "/static/**", "/*.js", "/*.css",
                         "/*.png", "/*.jpg", "/*.svg", "/*.ico", "/*.webp").permitAll()
 
