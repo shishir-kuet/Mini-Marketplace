@@ -31,6 +31,6 @@ jwt:
 server:
   port: ${PORT:8083}
   error:
-    include-message: always
-    include-binding-errors: always
+    include-message: never      # Do not leak internal error details in production
+    include-binding-errors: never
 
