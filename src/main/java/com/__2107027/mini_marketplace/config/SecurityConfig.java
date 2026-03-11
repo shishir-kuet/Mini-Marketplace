@@ -44,13 +44,18 @@ public class SecurityConfig {
     }
 
     /**
-     * CORS configuration to allow requests from any origin
-     * Necessary for REST API access from different domains
+     * CORS configuration — only needed for local development when the React dev server
+     * (localhost:3000) calls the Spring Boot API (localhost:8083).
+     * In production, frontend is served from the same origin so CORS is irrelevant.
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // Use patterns instead of origins
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+                "http://localhost:3000",  // Vite / CRA dev server
+                "http://localhost:5173",  // Vite alternative default port
+                "http://localhost:8083"   // Same-origin requests
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
@@ -58,7 +63,7 @@ public class SecurityConfig {
         configuration.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/api/**", configuration); // Only needed for /api routes
         return source;
     }
 
@@ -86,6 +91,11 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
             .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless REST API  
             .authorizeHttpRequests(authz -> authz
+                // Serve React app — index.html and all static assets are public
+                .requestMatchers("/", "/index.html", "/favicon.ico").permitAll()
+                .requestMatchers("/assets/**", "/static/**", "/*.js", "/*.css",
+                        "/*.png", "/*.jpg", "/*.svg", "/*.ico", "/*.webp").permitAll()
+
                 // Auth and health endpoints - no authentication required
                 .requestMatchers("/api/auth/**", "/api/public/**").permitAll()
                 .requestMatchers("/api/health/**").permitAll()
@@ -97,8 +107,11 @@ public class SecurityConfig {
                 // Admin-only endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                // All other requests require authentication
-                .anyRequest().authenticated()
+                // All other API requests require authentication
+                .requestMatchers("/api/**").authenticated()
+
+                // All non-API routes are forwarded to the React SPA (handled by SpaController)
+                .anyRequest().permitAll()
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // No sessions, JWT only
