@@ -107,7 +107,7 @@ jobs:
         run: |
           echo "## Test Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -f target/surefire-reports/*.xml ]; then
+          if compgen -G "target/surefire-reports/*.xml" > /dev/null 2>&1; then
             echo "✅ Tests completed" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "Check the artifacts for detailed test reports." >> $GITHUB_STEP_SUMMARY
