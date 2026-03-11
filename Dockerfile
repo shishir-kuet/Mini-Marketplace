@@ -24,12 +24,12 @@ RUN addgroup -g 1001 -S appgroup && \
 RUN chown -R appuser:appgroup /app
 USER appuser
 
-# Expose port
-EXPOSE 8082
+# Expose port (Render overrides this with PORT env var)
+EXPOSE 8083
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8082/api/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-8083}/api/health || exit 1
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
