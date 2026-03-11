@@ -20,16 +20,17 @@ spring:
         format_sql: true
 
 # JWT Configuration
+# Set JWT_SECRET env var on your deployment platform (Render → Environment → Add Secret File)
 jwt:
-  secret: mySecretKeyForJWTTokenGenerationMustBeLongEnoughForHS256AlgorithmMinimum256Bits
-  expiration: 86400000  # 24 hours in milliseconds
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}  # 24 hours default
 
 # Server Configuration
 server:
-  port: 8082
+  port: ${PORT:8083}
   error:
-    include-message: always
-    include-binding-errors: always
+    include-message: never      # Never leak internal messages in production
+    include-binding-errors: never
 
 ---
 # Local development profile

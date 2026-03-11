@@ -132,8 +132,25 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build with Maven (skip tests)
-        run: ./mvnw clean package -DskipTests --batch-mode
+      # Install Node.js so the frontend-maven-plugin can run npm build.
+      # When frontend/package.json is not yet in the repo the Maven
+      # no-frontend profile is activated automatically (see pom.xml).
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Build with Maven
+        run: |
+          if [ -f frontend/package.json ]; then
+            echo "Frontend found — full build including React"
+            ./mvnw clean package -DskipTests --batch-mode
+          else
+            echo "No frontend yet — building API only (-Pno-frontend)"
+            ./mvnw clean package -DskipTests -Pno-frontend --batch-mode
+          fi
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -150,9 +167,29 @@ jobs:
           echo "Branch: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
           echo "Commit: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
 
+  deploy:
+    name: Deploy to Render
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    # Only deploy on push to deploy or main — not on every feature branch
+    if: >
+      success() &&
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/deploy' || github.ref == 'refs/heads/main')
+
+    steps:
+      - name: Trigger Render deploy
+        run: |
+          curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -d '{"clearCache": false}'
+          echo "✅ Render deploy triggered"
+
   status-check:
     name: CI/CD Status Check
-    needs: [test, build]
+    needs: [test, build, deploy]
     runs-on: ubuntu-latest
     if: always()
 
