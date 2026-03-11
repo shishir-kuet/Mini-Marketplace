@@ -1,0 +1,2 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  com.__2107027.mini_marketplace.config.DataSourceUrlPostProcessor
