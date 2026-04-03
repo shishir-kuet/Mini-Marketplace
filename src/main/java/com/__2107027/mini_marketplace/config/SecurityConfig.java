@@ -90,9 +90,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**", "/api/public/**").permitAll()
                 .requestMatchers("/api/health/**").permitAll()
 
-                // Public read-only access to products and categories
+                // Public read-only access to products, categories, and product reviews
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/reviews/product/**").permitAll()
 
                 // Admin-only endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
