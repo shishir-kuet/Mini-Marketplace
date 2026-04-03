@@ -13,11 +13,14 @@ public class ProductResponse {
     private String imageUrl;
     private int stockCount;
     private LocalDateTime createdAt;
+    private long reviewCount;
+    private Double averageRating;
 
     public ProductResponse() {}
 
     public ProductResponse(Long id, String title, String description, BigDecimal price,
-                           Long sellerId, String sellerUsername, String imageUrl, int stockCount, LocalDateTime createdAt) {
+                           Long sellerId, String sellerUsername, String imageUrl, int stockCount,
+                           LocalDateTime createdAt, long reviewCount, Double averageRating) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -27,6 +30,8 @@ public class ProductResponse {
         this.imageUrl = imageUrl;
         this.stockCount = stockCount;
         this.createdAt = createdAt;
+        this.reviewCount = reviewCount;
+        this.averageRating = averageRating;
     }
 
     // Getters and Setters
@@ -56,4 +61,10 @@ public class ProductResponse {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public long getReviewCount() { return reviewCount; }
+    public void setReviewCount(long reviewCount) { this.reviewCount = reviewCount; }
+
+    public Double getAverageRating() { return averageRating; }
+    public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
 }

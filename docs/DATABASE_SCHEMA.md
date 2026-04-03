@@ -99,18 +99,48 @@ Because product prices may change later, but **order history must remain correct
 
 ---
 
+## 5️⃣ Reviews
+
+Stores product feedback written by users.
+
+```sql
+Reviews
+-------
+id (PK)
+user_id (FK → Users.id)
+product_id (FK → Products.id)
+rating
+comment
+created_at
+updated_at
+```
+
+### Key Rule
+
+```text
+One user can review many products.
+One product can have reviews from many users.
+user_id + product_id should be unique.
+```
+
+---
+
 # Relationship Summary
 
 ```
 Users
  ├── sells → Products
- └── buys → Orders
+ ├── buys → Orders
+ └── writes → Reviews
 
 Orders
  └── contains → Order_Items
 
 Order_Items
  └── references → Products
+
+Products
+ └── receives → Reviews
 ```
 
 ---
@@ -130,6 +160,11 @@ Users
               |
               | 1
               |------< Order_Items >------ Products
+
+Users
+  |
+  | 1
+  |------< Reviews >------ Products
 ```
 
 ---

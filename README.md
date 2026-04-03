@@ -60,6 +60,9 @@ mvn spring-boot:run
 ## 🔗 API Endpoints
 
 - **Auth**: `/api/auth/register`, `/api/auth/login`
+- **Products**: `/api/products`, `/api/products/{id}`, `/api/products/search`
+- **Orders**: `/api/orders`, `/api/orders/my`, `/api/orders/seller-orders`
+- **Reviews**: `/api/reviews/product/{productId}`, `/api/reviews/product/{productId}/summary`, `/api/reviews/my`
 - **Health**: `/actuator/health`
 
 ## 🏗 Development Workflow
