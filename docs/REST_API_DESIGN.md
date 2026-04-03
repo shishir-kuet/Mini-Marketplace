@@ -215,6 +215,33 @@ Response `204 No Content`
 
 ---
 
+## Review Endpoints
+
+### GET /api/reviews/product/{productId} — Reviews for Product *(Public)*
+```json
+[{ "id": 1, "userId": 6, "username": "ratul", "productId": 3, "productTitle": "Gaming Laptop", "rating": 5, "comment": "Great product", "createdAt": "...", "updatedAt": "..." }]
+```
+
+### GET /api/reviews/product/{productId}/summary — Rating Summary *(Public)*
+```json
+{ "productId": 3, "reviewCount": 12, "averageRating": 4.6 }
+```
+
+### GET /api/reviews/my — My Reviews *(Authenticated)*
+
+### POST /api/reviews — Create Review *(Authenticated)*
+```json
+{ "productId": 3, "rating": 5, "comment": "Great product" }
+```
+Only one review per user per product.
+
+### PUT /api/reviews/{id} — Update Review *(Owner or Admin)*
+
+### DELETE /api/reviews/{id} — Delete Review *(Owner or Admin)*
+Response `204 No Content`
+
+---
+
 ## Authorization Summary
 
 | Endpoint | Public | Auth | Owner/Admin | Admin |

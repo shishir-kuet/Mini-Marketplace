@@ -6,6 +6,7 @@ import com.__2107027.mini_marketplace.exception.ResourceNotFoundException;
 import com.__2107027.mini_marketplace.model.Product;
 import com.__2107027.mini_marketplace.model.User;
 import com.__2107027.mini_marketplace.repository.ProductRepository;
+import com.__2107027.mini_marketplace.repository.ReviewRepository;
 import com.__2107027.mini_marketplace.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +40,9 @@ class ProductServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ReviewRepository reviewRepository;
 
     @InjectMocks
     private ProductService productService;
@@ -74,6 +78,9 @@ class ProductServiceTest {
         productRequest.setTitle("Gaming Laptop");
         productRequest.setDescription("RTX 4060");
         productRequest.setPrice(new BigDecimal("75000.00"));
+
+        lenient().when(reviewRepository.countByProduct_Id(1L)).thenReturn(0L);
+        lenient().when(reviewRepository.findAverageRatingByProductId(1L)).thenReturn(0.0);
     }
 
     @AfterEach

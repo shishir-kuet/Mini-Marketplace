@@ -6,6 +6,7 @@ import com.__2107027.mini_marketplace.exception.ResourceNotFoundException;
 import com.__2107027.mini_marketplace.model.Product;
 import com.__2107027.mini_marketplace.model.User;
 import com.__2107027.mini_marketplace.repository.ProductRepository;
+import com.__2107027.mini_marketplace.repository.ReviewRepository;
 import com.__2107027.mini_marketplace.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,6 +25,9 @@ public class ProductService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ReviewRepository reviewRepository;
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private User getCurrentUser() {
@@ -36,6 +40,8 @@ public class ProductService {
         String sellerUsername = userRepository.findById(product.getSellerId())
                 .map(User::getUsername)
                 .orElse("unknown");
+        long reviewCount = reviewRepository.countByProduct_Id(product.getId());
+        Double averageRating = reviewRepository.findAverageRatingByProductId(product.getId());
         return new ProductResponse(
                 product.getId(),
                 product.getTitle(),
@@ -45,7 +51,9 @@ public class ProductService {
                 sellerUsername,
                 product.getImageUrl(),
                 product.getStockCount(),
-                product.getCreatedAt()
+                product.getCreatedAt(),
+                reviewCount,
+                averageRating == null ? 0.0 : averageRating
         );
     }
 
