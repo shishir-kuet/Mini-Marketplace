@@ -1,89 +1,211 @@
 # Mini Marketplace
 
-A Spring Boot-based mini marketplace application with JWT authentication and PostgreSQL database.
+Mini Marketplace is a Spring Boot REST API for a small marketplace domain with JWT authentication, role-based access control, PostgreSQL persistence, and Docker-friendly deployment.
 
-## 🚀 Quick Start
+## Project Description
 
-### Using Docker (Recommended for Team Development)
+The application supports user registration and login, product listing and search, order placement and management, category administration, and product reviews. The security model is stateless and token-based, with public read access for catalog data and restricted write access for authenticated users, owners, and admins.
+
+## Architecture Diagram
+
+```mermaid
+flowchart LR
+	Client[Client Apps\nWeb, mobile, Postman] --> Api[Spring Boot REST API]
+	Api --> Security[JWT Authentication Filter\nSecurityConfig]
+	Api --> Controllers[Controllers\nAuth, Users, Products, Categories, Orders, Reviews, Health]
+	Controllers --> Services[Service Layer]
+	Services --> Repositories[Spring Data JPA Repositories]
+	Repositories --> Database[(PostgreSQL)]
+	Services --> Rules[Validation and business rules]
+```
+
+Browser-viewable diagram page: [docs/mini-marketplace-diagrams.html](docs/mini-marketplace-diagrams.html)
+
+Editable diagram source: [docs/mini-marketplace-diagrams.drawio.xml](docs/mini-marketplace-diagrams.drawio.xml)
+
+## ER Diagram
+
+```mermaid
+erDiagram
+	USERS ||--o{ PRODUCTS : sells
+	USERS ||--o{ ORDERS : places
+	ORDERS ||--o{ ORDER_ITEMS : contains
+	PRODUCTS ||--o{ ORDER_ITEMS : referenced_by
+	USERS ||--o{ REVIEWS : writes
+	PRODUCTS ||--o{ REVIEWS : receives
+
+	USERS {
+		bigint id PK
+		string username UK
+		string email UK
+		string password
+		string role
+		datetime created_at
+	}
+
+	CATEGORIES {
+		bigint id PK
+		string name UK
+		string description
+		datetime created_at
+	}
+
+	PRODUCTS {
+		bigint id PK
+		string title
+		string description
+		decimal price
+		bigint seller_id FK
+		string image_url
+		int stock_count
+		datetime created_at
+	}
+
+	ORDERS {
+		bigint id PK
+		bigint buyer_id FK
+		string status
+		datetime created_at
+	}
+
+	ORDER_ITEMS {
+		bigint id PK
+		bigint order_id FK
+		bigint product_id FK
+		int quantity
+		decimal price
+	}
+
+	REVIEWS {
+		bigint id PK
+		bigint user_id FK
+		bigint product_id FK
+		int rating
+		string comment
+		datetime created_at
+		datetime updated_at
+	}
+```
+
+Browser-viewable diagram page: [docs/mini-marketplace-diagrams.html](docs/mini-marketplace-diagrams.html)
+
+## API Endpoints
+
+| Area | Method | Path | Access | Purpose |
+|---|---|---|---|---|
+| Auth | POST | /api/auth/register | Public | Register a new user |
+| Auth | POST | /api/auth/login | Public | Authenticate and return JWT |
+| Auth | GET | /api/auth/me | Authenticated | Read the current authenticated user |
+| Users | GET | /api/users/me | Authenticated | Read the current profile |
+| Users | PUT | /api/users/me | Authenticated | Update the current profile |
+| Users | GET | /api/users | Admin | List all users |
+| Users | GET | /api/users/{id} | Admin | Get a user by ID |
+| Users | PUT | /api/users/{id}/role | Admin | Change a user role |
+| Users | DELETE | /api/users/{id} | Admin | Delete a user |
+| Categories | GET | /api/categories | Public | List categories |
+| Categories | GET | /api/categories/{id} | Public | Get category by ID |
+| Categories | POST | /api/categories | Admin | Create a category |
+| Categories | PUT | /api/categories/{id} | Admin | Update a category |
+| Categories | DELETE | /api/categories/{id} | Admin | Delete a category |
+| Products | GET | /api/products | Public | List all products |
+| Products | GET | /api/products/{id} | Public | Get product by ID |
+| Products | GET | /api/products/seller/{sellerId} | Public | List products by seller |
+| Products | GET | /api/products/search?title=... | Public | Search products by title |
+| Products | GET | /api/products/my | Authenticated | List current seller products |
+| Products | POST | /api/products | Authenticated | Create a product |
+| Products | PUT | /api/products/{id} | Authenticated | Update a product |
+| Products | DELETE | /api/products/{id} | Authenticated | Delete a product |
+| Orders | POST | /api/orders | Authenticated | Place an order |
+| Orders | GET | /api/orders/my | Authenticated | List current buyer orders |
+| Orders | GET | /api/orders/{id} | Authenticated | Get an order by ID |
+| Orders | PUT | /api/orders/{id}/cancel | Authenticated | Cancel an order |
+| Orders | GET | /api/orders/seller-orders | Authenticated | List orders containing seller products |
+| Orders | PUT | /api/orders/{id}/status | Authenticated | Update order status |
+| Orders | GET | /api/orders | Admin | List all orders |
+| Orders | PUT | /api/orders/{id}/complete | Admin | Mark an order completed |
+| Reviews | GET | /api/reviews/product/{productId} | Public | List reviews for a product |
+| Reviews | GET | /api/reviews/product/{productId}/summary | Public | Get review summary |
+| Reviews | GET | /api/reviews/my | Authenticated | List current user reviews |
+| Reviews | POST | /api/reviews | Authenticated | Create a review |
+| Reviews | PUT | /api/reviews/{id} | Authenticated | Update a review |
+| Reviews | DELETE | /api/reviews/{id} | Authenticated | Delete a review |
+| Health | GET | /api/health | Public | Basic health check |
+| Health | GET | /api/health/detailed | Public | Detailed health info |
+| Health | GET | /api/health/live | Public | Liveness probe |
+| Health | GET | /api/health/ready | Public | Readiness probe |
+
+## Run Instructions
+
+### Local Development
+
+1. Start PostgreSQL on port 5433, or point SPRING_DATASOURCE_URL at your own database.
+2. Set JWT_SECRET if you want to override the default development secret.
+3. Run the application:
 
 ```bash
-# 1. Start the database
-docker-compose up postgres -d
-
-# 2. Run the application  
-mvn spring-boot:run
-
-# 3. Access at http://localhost:8082
+./mvnw spring-boot:run
 ```
 
-### Manual Setup
+The default application port is 8083, so the API is available at http://localhost:8083/api.
+
+### Docker Compose
 
 ```bash
-# 1. Set up PostgreSQL database
-# 2. Configure application.yaml 
-# 3. Run: mvn spring-boot:run
+docker compose up postgres -d
+./mvnw spring-boot:run
 ```
 
-## 📁 Project Structure
+For full containerized stack:
 
-```
-├── src/                    # Source code
-├── docs/                   # Documentation
-│   ├── DOCKER_SETUP.md     # Docker setup guide
-│   ├── JWT_TESTING_GUIDE.md # JWT testing guide  
-│   └── README-TESTING-CICD.md # CI/CD documentation
-├── scripts/                # Utility scripts
-│   ├── docker-helper.sh    # Docker management script
-│   └── create-develop-branch.ps1 # Git workflow script
-├── sql/                    # Database scripts
-│   └── fix-database-constraint.sql
-├── docker-compose.yml      # Docker services
-├── Dockerfile              # App containerization
-└── pom.xml                 # Maven configuration
+```bash
+docker compose --profile full-stack up --build
 ```
 
-## 🛠 Technology Stack
+### Health Check
 
-- **Backend**: Spring Boot 3.3.2
-- **Security**: Spring Security + JWT
-- **Database**: PostgreSQL 13
-- **Build Tool**: Maven
-- **Containerization**: Docker & Docker Compose
-- **Java Version**: 17
+```bash
+curl http://localhost:8083/api/health
+```
 
-## 📖 Documentation
+## CI/CD Explanation
 
-- **[Docker Setup Guide](docs/DOCKER_SETUP.md)** - Team development environment
-- **[JWT Testing Guide](docs/JWT_TESTING_GUIDE.md)** - API authentication testing
-- **[CI/CD Guide](docs/README-TESTING-CICD.md)** - Continuous integration setup
+The repository uses GitHub Actions workflows:
 
-## 🔗 API Endpoints
+1. .github/workflows/ci.yml runs on every push and pull request. It starts a PostgreSQL 13 service, configures a test application.yaml, runs Maven tests, generates reports, and builds the application jar if tests pass.
+2. .github/workflows/keep-alive.yml pings the deployed health endpoint on schedule so the Render instance stays warm.
 
-- **Auth**: `/api/auth/register`, `/api/auth/login`
-- **Products**: `/api/products`, `/api/products/{id}`, `/api/products/search`
-- **Orders**: `/api/orders`, `/api/orders/my`, `/api/orders/seller-orders`
-- **Reviews**: `/api/reviews/product/{productId}`, `/api/reviews/product/{productId}/summary`, `/api/reviews/my`
-- **Health**: `/actuator/health`
+This provides automatic verification on every change, build artifacts for successful runs, and uptime protection for the hosted instance.
 
-## 🏗 Development Workflow
+## Project Structure
 
-1. **Setup**: Follow [Docker Setup Guide](docs/DOCKER_SETUP.md)
-2. **Development**: Create feature branches from `develop`
-3. **Testing**: Use scripts in `scripts/` directory  
-4. **Review**: Create PR to `develop` branch
-5. **Deploy**: Merge `develop` → `main`
+```text
+├── src/                    Source code
+├── docs/                   Documentation and diagrams
+├── scripts/                Utility scripts
+├── sql/                    Database helper scripts
+├── docker-compose.yml      Docker services
+├── Dockerfile              Application container image
+└── pom.xml                 Maven build configuration
+```
 
-## 👥 Team Members
+## Technology Stack
+
+- Spring Boot 3.3.2
+- Spring Security with JWT
+- Spring Data JPA
+- PostgreSQL 13
+- Maven
+- Docker and Docker Compose
+- Java 17
+
+## Related Documentation
+
+- [Docker setup guide](docs/DOCKER_SETUP.md)
+- [Database schema notes](docs/DATABASE_SCHEMA.md)
+- [REST API design reference](docs/REST_API_DESIGN.md)
+- [Review API testing summary](REVIEW_API_TEST_SUMMARY.md)
+- [Review manual testing guide](REVIEW_API_MANUAL_TESTING.md)
+
+## Team Members
 
 - Student ID: 2107029, 2107027
-
-## 🚀 Getting Started for New Developers
-
-```bash
-git clone https://github.com/shishir-kuet/Mini-Marketplace.git
-cd mini-marketplace
-docker-compose up postgres -d
-mvn spring-boot:run
-```
-
-Visit [docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md) for detailed setup instructions.
