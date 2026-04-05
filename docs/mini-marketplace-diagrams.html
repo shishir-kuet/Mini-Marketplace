@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Marketplace Diagrams</title>
+  <style>
+    :root {
+      --bg: #eef4fb;
+      --surface: #ffffff;
+      --surface-soft: #f8fbff;
+      --ink: #10233e;
+      --muted: #5f6f89;
+      --brand: #155eef;
+      --brand-2: #0f9d8a;
+      --brand-3: #f59e0b;
+      --line: rgba(16, 35, 62, 0.12);
+      --shadow: 0 18px 50px rgba(16, 35, 62, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(21, 94, 239, 0.11), transparent 28%),
+        radial-gradient(circle at top right, rgba(15, 157, 138, 0.11), transparent 24%),
+        linear-gradient(180deg, #f6f9fd 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 34px 24px 16px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f2a55 0%, #155eef 52%, #0f9d8a 100%);
+      color: #ffffff;
+      border-radius: 28px;
+      padding: 30px 28px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      filter: blur(4px);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: -0.03em;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 80ch;
+      line-height: 1.6;
+    }
+
+    .hero p {
+      color: rgba(255, 255, 255, 0.86);
+      max-width: 72ch;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      font-size: 0.92rem;
+      backdrop-filter: blur(6px);
+    }
+
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 14px 24px 42px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .overview {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 18px 18px 16px;
+    }
+
+    .card .label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .card strong {
+      display: block;
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .section-head {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(90deg, rgba(21, 94, 239, 0.07), rgba(15, 157, 138, 0.06), rgba(245, 158, 11, 0.05));
+      position: relative;
+    }
+
+    .section-head::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: linear-gradient(180deg, var(--brand), var(--brand-2), var(--brand-3));
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      padding-left: 8px;
+    }
+
+    .section-head span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      padding-left: 8px;
+    }
+
+    .diagram {
+      padding: 18px;
+      background: linear-gradient(180deg, var(--surface-soft), #ffffff);
+    }
+
+    .mermaid {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .note {
+      padding: 0 4px 4px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .link {
+      color: var(--brand);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+    }
+  </style>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: "base",
+      themeVariables: {
+        fontFamily: "Segoe UI, Trebuchet MS, Arial, sans-serif",
+        primaryColor: "#dbeafe",
+        primaryTextColor: "#10233e",
+        primaryBorderColor: "#155eef",
+        lineColor: "#6b7d99",
+        secondaryColor: "#dcfce7",
+        tertiaryColor: "#fef3c7"
+      }
+    });
+  </script>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <h1>Mini Marketplace Diagrams</h1>
+      <p>Browser-viewable architecture and ER diagrams for the Spring Boot mini marketplace project. The layout uses a brighter palette, clearer spacing, and stronger contrast so the structure is easy to scan.</p>
+      <div class="hero-badges">
+        <span class="badge">Architecture overview</span>
+        <span class="badge">ER relationship map</span>
+        <span class="badge">Direct browser preview</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="overview">
+      <div class="card">
+        <span class="label">Layered flow</span>
+        <strong>Client → Security → Controllers → Services → Database</strong>
+        <p>Shows the main request path through the application stack.</p>
+      </div>
+      <div class="card">
+        <span class="label">Core entities</span>
+        <strong>Users, Products, Orders, Order Items, Reviews</strong>
+        <p>Summarizes the main tables and relationships in the marketplace domain.</p>
+      </div>
+      <div class="card">
+        <span class="label">Visual style</span>
+        <strong>Clean background with blue, teal, and amber accents</strong>
+        <p>Built to be readable on both laptop and large-screen previews.</p>
+      </div>
+    </div>
+
+    <section>
+      <div class="section-head">
+        <h2>Architecture Diagram</h2>
+        <span>Client requests pass through JWT security, REST controllers, services, repositories, and PostgreSQL.</span>
+      </div>
+      <div class="diagram">
+        <div class="mermaid">
+flowchart LR
+    Client[Client Apps<br/>Web, mobile, Postman] --> Api[Spring Boot REST API]
+    Api --> Security[JWT Authentication Filter<br/>SecurityConfig]
+    Api --> Controllers[Controllers<br/>Auth, Users, Products, Categories, Orders, Reviews, Health]
+    Controllers --> Services[Service Layer]
+    Services --> Repositories[Spring Data JPA Repositories]
+    Repositories --> Database[(PostgreSQL)]
+    Services --> Rules[Validation and business rules]
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>ER Diagram</h2>
+        <span>Users sell products, place orders, write reviews, and order items reference products.</span>
+      </div>
+      <div class="diagram">
+        <div class="mermaid">
+erDiagram
+    USERS ||--o{ PRODUCTS : sells
+    USERS ||--o{ ORDERS : places
+    ORDERS ||--o{ ORDER_ITEMS : contains
+    PRODUCTS ||--o{ ORDER_ITEMS : referenced_by
+    USERS ||--o{ REVIEWS : writes
+    PRODUCTS ||--o{ REVIEWS : receives
+
+    USERS {
+        bigint id PK
+        string username UK
+        string email UK
+        string password
+        string role
+        datetime created_at
+    }
+
+    CATEGORIES {
+        bigint id PK
+        string name UK
+        string description
+        datetime created_at
+    }
+
+    PRODUCTS {
+        bigint id PK
+        string title
+        string description
+        decimal price
+        bigint seller_id FK
+        string image_url
+        int stock_count
+        datetime created_at
+    }
+
+    ORDERS {
+        bigint id PK
+        bigint buyer_id FK
+        string status
+        datetime created_at
+    }
+
+    ORDER_ITEMS {
+        bigint id PK
+        bigint order_id FK
+        bigint product_id FK
+        int quantity
+        decimal price
+    }
+
+    REVIEWS {
+        bigint id PK
+        bigint user_id FK
+        bigint product_id FK
+        int rating
+        string comment
+        datetime created_at
+        datetime updated_at
+    }
+        </div>
+      </div>
+    </section>
+
+    <div class="note">
+      Editable source: <a class="link" href="mini-marketplace-diagrams.drawio.xml">mini-marketplace-diagrams.drawio.xml</a>
+    </div>
+  </main>
+</body>
+</html>

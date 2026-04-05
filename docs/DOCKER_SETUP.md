@@ -8,7 +8,7 @@ This setup ensures all team members work with the same database configuration an
 
 1. **Start only the database (Recommended for development)**:
    ```bash
-   docker-compose up postgres -d
+   docker compose up postgres -d
    ```
 
 2. **Run your Spring Boot app locally**:
@@ -21,20 +21,20 @@ This setup ensures all team members work with the same database configuration an
 
 3. **Stop the database**:
    ```bash
-   docker-compose down
+   docker compose down
    ```
 
 ### Advanced Setup
 
 1. **Full containerized setup** (app + database):
    ```bash
-   docker-compose --profile full-stack up -d
+   docker compose up -d
    ```
 
 2. **View logs**:
    ```bash
-   docker-compose logs -f postgres  # Database logs
-   docker-compose logs -f app       # Application logs (if using full-stack)
+   docker compose logs -f postgres  # Database logs
+   docker compose logs -f app       # Application logs
    ```
 
 ### Team Workflow
@@ -46,68 +46,68 @@ git clone https://github.com/shishir-kuet/Mini-Marketplace.git
 cd mini-marketplace
 
 # 2. Start the database
-docker-compose up postgres -d
+docker compose up postgres -d
 
 # 3. Run the application
 mvn spring-boot:run -Dspring-boot.run.profiles=local
 
-# 4. Access at http://localhost:8082
+# 4. Access at http://localhost:8083
 ```
 
 #### Daily Development:
 ```bash
 # Start working
-docker-compose up postgres -d
+docker compose up postgres -d
 mvn spring-boot:run -Dspring-boot.run.profiles=local
 
 # Stop working
-docker-compose down
+docker compose down
 ```
 
 ### Database Connection Details
 
 - **Host**: localhost 
-- **Port**: 5432
+- **Port**: 5433
 - **Database**: mini_marketplace
 - **Username**: postgres  
 - **Password**: postgres
 
 ### Configuration Profiles
 
-We support multiple profiles for different environments:
+We support these common database targets:
 
-- **`local`** (Default for Docker): `localhost:5432`
-- **`legacy`**: Your teammate's original setup `localhost:5433` 
-- **Docker internal**: `postgres:5432` (when app runs in container)
+- Local host to Docker PostgreSQL: `localhost:5433`
+- Docker internal network (when app runs in container): `postgres:5432`
+- Legacy teammate setup (if still needed): `localhost:5433`
 
 ### Data Persistence
 
 - Database data is persisted in a Docker volume (`postgres_data`)
 - Data survives container restarts
-- To reset database: `docker-compose down -v` (⚠️ This deletes all data!)
+- To reset database: `docker compose down -v` (⚠️ This deletes all data!)
 
 ### Troubleshooting
 
 1. **Port conflicts**:
    ```bash
-   # If port 5432 is busy, change in docker-compose.yml:
+    # If port 5433 is busy, change in docker-compose.yml:
    ports:
-     - "5433:5432"  # Use 5433 instead
+       - "5434:5432"  # Example alternative host port
    ```
 
 2. **Database connection issues**:
    ```bash
    # Check if container is running
-   docker-compose ps
+   docker compose ps
    
    # Check logs
-   docker-compose logs postgres
+   docker compose logs postgres
    ```
 
 3. **Reset everything**:
    ```bash
-   docker-compose down -v
-   docker-compose up postgres -d
+   docker compose down -v
+   docker compose up postgres -d
    ```
 
 ### Migration from Individual Setups
@@ -118,7 +118,7 @@ We support multiple profiles for different environments:
 pg_dump -h localhost -p 5433 -U postgres mini_marketplace > backup.sql
 
 # Import to Docker database
-docker-compose exec postgres psql -U postgres -d mini_marketplace < backup.sql
+docker compose exec postgres psql -U postgres -d mini_marketplace < backup.sql
 ```
 
 **Option 2: Start Fresh**

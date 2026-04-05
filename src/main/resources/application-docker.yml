@@ -4,9 +4,9 @@ spring:
   
   # Default configuration (Docker environment)
   datasource:
-    url: jdbc:postgresql://postgres:5432/mini_marketplace
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/mini_marketplace}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   
   # JPA/Hibernate Configuration
@@ -21,7 +21,7 @@ spring:
 
 # JWT Configuration
 jwt:
-  secret: mySecretKeyForJWTTokenGenerationMustBeLongEnoughForHS256AlgorithmMinimum256Bits
+  secret: ${JWT_SECRET}
   expiration: 86400000  # 24 hours in milliseconds
 
 # Server Configuration
@@ -38,9 +38,9 @@ spring:
     activate:
       on-profile: local
   datasource:
-    url: jdbc:postgresql://localhost:5432/mini_marketplace
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/mini_marketplace}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
 ---
 # Original teammate configuration
@@ -49,6 +49,6 @@ spring:
     activate:
       on-profile: legacy
   datasource:
-    url: jdbc:postgresql://localhost:5433/mini_marketplace
-    username: postgres
-    password: Vitruvian09csg1.6textabs
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/mini_marketplace}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD}
