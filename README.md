@@ -6,6 +6,16 @@ Mini Marketplace is a Spring Boot REST API for a small marketplace domain with J
 
 The application supports user registration and login, product listing and search, order placement and management, category administration, and product reviews. The security model is stateless and token-based, with public read access for catalog data and restricted write access for authenticated users, owners, and admins.
 
+## Live Deployment URLs
+
+- Frontend / live site: https://lagbenaki.onrender.com
+- Backend API base URL: https://mini-marketplace-z2vn.onrender.com/api/
+
+Example health check on deployed backend:
+
+```text
+https://mini-marketplace-z2vn.onrender.com/api/health
+```
 ## Architecture Diagram
 
 ```mermaid
@@ -19,9 +29,7 @@ flowchart LR
 	Services --> Rules[Validation and business rules]
 ```
 
-Browser-viewable diagram page: [docs/mini-marketplace-diagrams.html](docs/mini-marketplace-diagrams.html)
-
-Editable diagram source: [docs/mini-marketplace-diagrams.drawio.xml](docs/mini-marketplace-diagrams.drawio.xml)
+The architecture diagram is embedded above in this README.
 
 ## ER Diagram
 
@@ -87,7 +95,7 @@ erDiagram
 	}
 ```
 
-Browser-viewable diagram page: [docs/mini-marketplace-diagrams.html](docs/mini-marketplace-diagrams.html)
+The ER diagram is embedded above in this README.
 
 ## API Endpoints
 
@@ -158,7 +166,7 @@ docker compose up postgres -d
 For full containerized stack:
 
 ```bash
-docker compose --profile full-stack up --build
+docker compose up --build
 ```
 
 ### Health Check

@@ -15,8 +15,14 @@ services:
       - ./init-scripts:/docker-entrypoint-initdb.d/
     networks:
       - marketplace-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mini_marketplace"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
-  # Spring Boot Application (Optional - for full containerization)
+  # Spring Boot Application
   app:
     build:
       context: .
@@ -30,7 +36,8 @@ services:
     ports:
       - "8083:8083"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - marketplace-network
     healthcheck:
@@ -39,9 +46,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    profiles:
-      - full-stack  # Only start with docker-compose --profile full-stack up
-
 volumes:
   postgres_data:
 
