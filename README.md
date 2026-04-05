@@ -16,7 +16,6 @@ Example health check on deployed backend:
 ```text
 https://mini-marketplace-z2vn.onrender.com/api/health
 ```
-
 ## Architecture Diagram
 
 ```mermaid
