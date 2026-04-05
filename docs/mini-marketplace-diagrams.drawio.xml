@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-05T00:00:00.000Z" agent="GitHub Copilot" version="24.7.17" type="device">
+	<diagram id="architecture" name="Architecture Diagram">
+		<mxGraphModel dx="1280" dy="760" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+			<root>
+				<mxCell id="0" />
+				<mxCell id="1" parent="0" />
+				<mxCell id="2" value="Client Apps&#xa;Web, mobile, Postman" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="1">
+					<mxGeometry x="40" y="160" width="190" height="80" as="geometry" />
+				</mxCell>
+				<mxCell id="3" value="REST Controllers&#xa;Auth, Users, Products, Categories, Orders, Reviews, Health" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" vertex="1" parent="1">
+					<mxGeometry x="300" y="130" width="240" height="140" as="geometry" />
+				</mxCell>
+				<mxCell id="4" value="JWT Security Layer&#xa;SecurityConfig + JwtAuthenticationFilter" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;" vertex="1" parent="1">
+					<mxGeometry x="300" y="310" width="240" height="100" as="geometry" />
+				</mxCell>
+				<mxCell id="5" value="Service Layer&#xa;Business rules and authorization checks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;" vertex="1" parent="1">
+					<mxGeometry x="620" y="150" width="220" height="90" as="geometry" />
+				</mxCell>
+				<mxCell id="6" value="Spring Data JPA Repositories" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;" vertex="1" parent="1">
+					<mxGeometry x="920" y="150" width="220" height="90" as="geometry" />
+				</mxCell>
+				<mxCell id="7" value="PostgreSQL" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;" vertex="1" parent="1">
+					<mxGeometry x="1240" y="145" width="170" height="100" as="geometry" />
+				</mxCell>
+				<mxCell id="8" value="Validation, DTO mapping, exception handling" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;dashed=1;fontSize=13;" vertex="1" parent="1">
+					<mxGeometry x="620" y="290" width="520" height="70" as="geometry" />
+				</mxCell>
+				<mxCell id="9" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" parent="1" source="2" target="3">
+					<mxGeometry relative="1" as="geometry" />
+				</mxCell>
+				<mxCell id="10" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" parent="1" source="3" target="5">
+					<mxGeometry relative="1" as="geometry" />
+				</mxCell>
+				<mxCell id="11" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" parent="1" source="5" target="6">
+					<mxGeometry relative="1" as="geometry" />
+				</mxCell>
+				<mxCell id="12" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" parent="1" source="6" target="7">
+					<mxGeometry relative="1" as="geometry" />
+				</mxCell>
+				<mxCell id="13" style="dashed=1;endArrow=open;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" parent="1" source="4" target="3">
+					<mxGeometry relative="1" as="geometry" />
+				</mxCell>
+				<mxCell id="14" style="dashed=1;endArrow=open;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" parent="1" source="4" target="5">
+					<mxGeometry relative="1" as="geometry" />
+				</mxCell>
+			</root>
+		</mxGraphModel>
+	</diagram>
+	<diagram id="er" name="ER Diagram">
+		<mxGraphModel dx="1280" dy="760" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+			<root>
+				<mxCell id="0" />
+				<mxCell id="1" parent="0" />
+				<mxCell id="2" value="USERS&#xa;PK id&#xa;username (unique)&#xa;email (unique)&#xa;password&#xa;role&#xa;created_at" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
+					<mxGeometry x="50" y="120" width="180" height="150" as="geometry" />
+				</mxCell>
+				<mxCell id="3" value="PRODUCTS&#xa;PK id&#xa;title&#xa;description&#xa;price&#xa;FK seller_id → users.id&#xa;image_url&#xa;stock_count&#xa;created_at" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;" vertex="1" parent="1">
+					<mxGeometry x="300" y="110" width="220" height="180" as="geometry" />
+				</mxCell>
+				<mxCell id="4" value="ORDERS&#xa;PK id&#xa;FK buyer_id → users.id&#xa;status&#xa;created_at" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="1">
+					<mxGeometry x="310" y="360" width="200" height="130" as="geometry" />
+				</mxCell>
+				<mxCell id="5" value="ORDER_ITEMS&#xa;PK id&#xa;FK order_id → orders.id&#xa;FK product_id → products.id&#xa;quantity&#xa;price" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;" vertex="1" parent="1">
+					<mxGeometry x="600" y="350" width="230" height="150" as="geometry" />
+				</mxCell>
+				<mxCell id="6" value="REVIEWS&#xa;PK id&#xa;FK user_id → users.id&#xa;FK product_id → products.id&#xa;rating&#xa;comment&#xa;created_at&#xa;updated_at" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;" vertex="1" parent="1">
+					<mxGeometry x="620" y="110" width="230" height="190" as="geometry" />
+				</mxCell>
+				<mxCell id="7" value="CATEGORIES&#xa;PK id&#xa;name (unique)&#xa;description&#xa;created_at" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;" vertex="1" parent="1">
+					<mxGeometry x="930" y="120" width="180" height="130" as="geometry" />
+				</mxCell>
+				<mxCell id="8" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" parent="1" source="2" target="3">
+					<mxGeometry relative="1" as="geometry" />
+				</mxCell>
+				<mxCell id="9" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" parent="1" source="2" target="4">
+					<mxGeometry relative="1" as="geometry" />
+				</mxCell>
+				<mxCell id="10" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" parent="1" source="4" target="5">
+					<mxGeometry relative="1" as="geometry" />
+				</mxCell>
+				<mxCell id="11" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" parent="1" source="3" target="5">
+					<mxGeometry relative="1" as="geometry" />
+				</mxCell>
+				<mxCell id="12" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" parent="1" source="2" target="6">
+					<mxGeometry relative="1" as="geometry" />
+				</mxCell>
+				<mxCell id="13" style="endArrow=block;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;strokeWidth=2;" edge="1" parent="1" source="3" target="6">
+					<mxGeometry relative="1" as="geometry" />
+				</mxCell>
+			</root>
+		</mxGraphModel>
+	</diagram>
+</mxfile>
