@@ -19,9 +19,7 @@ flowchart LR
 	Services --> Rules[Validation and business rules]
 ```
 
-Browser-viewable diagram page: [docs/mini-marketplace-diagrams.html](docs/mini-marketplace-diagrams.html)
-
-Editable diagram source: [docs/mini-marketplace-diagrams.drawio.xml](docs/mini-marketplace-diagrams.drawio.xml)
+The architecture diagram is embedded above in this README.
 
 ## ER Diagram
 
@@ -87,7 +85,7 @@ erDiagram
 	}
 ```
 
-Browser-viewable diagram page: [docs/mini-marketplace-diagrams.html](docs/mini-marketplace-diagrams.html)
+The ER diagram is embedded above in this README.
 
 ## API Endpoints
 
@@ -158,7 +156,7 @@ docker compose up postgres -d
 For full containerized stack:
 
 ```bash
-docker compose --profile full-stack up --build
+docker compose up --build
 ```
 
 ### Health Check
